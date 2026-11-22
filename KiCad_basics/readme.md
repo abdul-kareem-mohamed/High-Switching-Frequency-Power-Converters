@@ -38,7 +38,7 @@ Figure 5: driver input voltage waveform <br>
 <img width="1820" height="708" alt="image" src="https://github.com/user-attachments/assets/0386aaee-2dd8-423d-a008-74f991490f04" /> <br>
 Figure 6: Collector current waveform for sinusoidal input voltage <br>
 
-
+Reference: https://www.woolseyworkshop.com/2019/07/01/performing-a-circuit-simulation-in-kicad/
 
 
 
