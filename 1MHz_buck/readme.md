@@ -83,8 +83,32 @@ Figure 2: output voltage ripple in steady state. Average of Vout = 12.2 V and pe
 Figure 3: Inductor current ripple in steady state. Average of I(L1) = 8.3 A and peak-to-peak current ripple corresponds to 2.66 A <br>
 
 <img width="1870" height="747" alt="image" src="https://github.com/user-attachments/assets/9bc6f226-d394-48d9-a441-5f70200c016a" /> <br>
-Figure 4: Switch node shape. 25% duty cycle = 250ns and switching period = 1us. -1.9 V dip for 10ns as a result of dead time and reverse conduction voltage drop of the switch. <br>
+Figure 4: Switch node shape. 25% duty cycle = 250ns and switching period = 1us. -1.9 V dip for 10ns as a result of dead time and reverse conduction voltage drop of the switch. <br>  
 
+To prevent shoot-through (both switches conducting simultaneously and shorting the $48\text{ V}$ bus to ground), the gate driver inserts two brief dead-time windows per cycle where both switches are OFF. Because $I_{L1}$ must keep flowing during both windows, it pulls charge out of the switch-node capacitance ($C_{\text{oss}}$), driving $V_{\text{sw}}$ negative until the low-side device begins conducting in the third quadrant (current flowing from Ground/Source up to Switch Node/Drain):
+
+* Falling-edge dead time (High-side OFF $\to$ Low-side ON): When the high-side turns OFF, $I_{L1}$ discharges $V_{\text{sw}}$ rapidly from $\sim 48\text{ V}$ down past $0\text{ V}$. Once $V_{\text{sw}}$ reaches $-V_{\text{SD}}$ ($\approx -1.9\text{ V}$), the low-side switch clamps the node and carries the full inductor current. The moment the low-side gate turns ON, its channel resistance drops to $R_{\text{DS(on)}}$ and $V_{\text{sw}}$ steps up from $-1.9\text{ V}$ to just below $0\text{ V}$ ($-I_L \cdot R_{\text{DS(on)}}$).
+* Rising-edge dead time (Low-side OFF $\to$ High-side ON): When the low-side gate turns OFF, $I_{L1}$ is still positive at its valley value. Because the low-resistance forward channel just closed, $V_{\text{sw}}$ immediately drops back down to $\approx -1.9\text{ V}$ to force reverse conduction again until the high-side switch turns ON and pulls $V_{\text{sw}}$ back up to $\sim 48\text{ V}$.
+
+### Why the Dip Is $\approx -1.9\text{ V}$ (GaN vs. Silicon MOSFET)  
+
+The exact depth of that negative shelf reveals the underlying semiconductor physics of the low-side switch. In a standard Silicon MOSFET, a physical parasitic PN body diode exists between source and drain. Once $V_{\text{sw}}$ drops to roughly $-0.7\text{ V}$ to $-1.0\text{ V}$, that diode forward-biases and clamps the node.   
+
+In an enhancement-mode GaN HEMT, there is no physical PN body diode. Instead, GaN devices are laterally symmetric: if the Drain ($V_{\text{sw}}$) drops far enough below the Source (GND), the Drain electrically acts as the new "Source" and the Source acts as the new "Drain." The 2DEG channel turns itself back on once the Gate-to-Drain voltage exceeds the device's gate threshold voltage  
+
+$$V_{\text{th}}$:$$V_{\text{GD}} = V_{\text{GS,off}} - V_{\text{sw}} \ge V_{\text{th}}$$  
+
+Solving for the reverse-conduction drop   
+
+$$V_{\text{SD}} = -V_{\text{sw}}$$ (and adding the voltage drop across the reverse-conducting channel resistance $R_{\text{SD}}$) gives:  
+
+$$V_{\text{SD}} \approx V_{\text{th}} - V_{\text{GS,off}} + I_L \cdot R_{\text{SD}}$$  
+
+With a typical $0\text{ V}$ turn-off drive ($V_{\text{GS,off}} = 0\text{ V}$), a GaN threshold of $V_{\text{th}} \approx 1.4\text{--}1.7\text{ V}$, and a few hundred millivolts of resistive/transconductance drop at $\sim 7\text{--}10\text{ A}$, $V_{\text{SD}}$ lands right around $1.9\text{ V}$, producing the $\approx -1.9\text{ V}$ dead-time shelf.
+
+* Dead-time conduction loss: Each dead-time interval dissipates $P_{\text{dead}} = V_{\text{SD}} \cdot I_L \cdot t_{\text{dead}} \cdot f_{\text{sw}}$. Because $V_{\text{SD}} \approx 1.9\text{ V}$ is 10–20 times larger than the on-state drop ($I_L R_{\text{DS(on)}}$), excess dead time quickly heats the low-side switch at $1\text{ MHz}$—for example, $20\text{ ns}$ of dead time at $1\text{ MHz}$ and $8.3\text{ A}$ burns roughly $0.32\text{ W}$ per edge. Keeping dead time tight (typically $5\text{--}20\text{ ns}$) is essential.
+
+* Penalty of negative gate-off bias: Notice from $V_{\text{SD}} \approx V_{\text{th}} - V_{\text{GS,off}} + I_L R_{\text{SD}}$ that driving a GaN gate to $-3\text{ V}$ when OFF pushes $V_{\text{SD}}$ up to $\sim 5\text{ V}$, more than doubling dead-time losses. That is why low-voltage GaN buck stages usually turn off to $0\text{ V}$ rather than a negative rail.
 
 
 
