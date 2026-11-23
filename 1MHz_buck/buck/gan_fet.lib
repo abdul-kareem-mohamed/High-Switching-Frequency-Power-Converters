@@ -1,0 +1,9 @@
+* Simple behavioral GaN FET: pins D G S
+* 100V class, Ron 3.2 mOhm, Coss 300 pF, reverse conduction ~1.9V @ 8A
+.subckt GANFET d g s
+S1 d s g s SWGAN
+Coss d s 300p
+Drev s d DGAN
+.model SWGAN SW(Vt=0.5 Vh=0.1 Ron=3.2m Roff=1Meg)
+.model DGAN D(IS=1e-15 N=2 RS=10m)
+.ends GANFET
