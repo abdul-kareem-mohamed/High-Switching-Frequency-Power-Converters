@@ -110,6 +110,13 @@ With a typical $0\text{ V}$ turn-off drive ($V_{\text{GS,off}} = 0\text{ V}$), a
 
 * Penalty of negative gate-off bias: Notice from $V_{\text{SD}} \approx V_{\text{th}} - V_{\text{GS,off}} + I_L R_{\text{SD}}$ that driving a GaN gate to $-3\text{ V}$ when OFF pushes $V_{\text{SD}}$ up to $\sim 5\text{ V}$, more than doubling dead-time losses. That is why low-voltage GaN buck stages usually turn off to $0\text{ V}$ rather than a negative rail.
 
+Now, I want to reduce the current ripple even further down to 5%, so ΔI = 0.05 × 8.33 A ≈ 0.42 A.  
+
+L = Vout(1 − D) / (fsw · ΔI) = 12 × 0.75 / (1 MHz × 0.42 A) ≈ 21.6 µH ≈ 22 µH.
+
+<img width="1902" height="885" alt="image" src="https://github.com/user-attachments/assets/b56b9321-97c5-4843-ba52-f7be4d41eb16" />
+
+
 
 
 
